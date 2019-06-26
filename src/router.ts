@@ -24,5 +24,6 @@ export default new Router({
       name: 'browser',
       component: () => import('./views/Browser.vue'),
     },
+    { path: '/weather', component: () => import('./views/Weather.vue') },
   ],
 });

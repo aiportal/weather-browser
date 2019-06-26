@@ -18,6 +18,7 @@
     "trailing-comma": true,
     "only-arrow-functions": false,
     "no-inferrable-types": true,
-    "semicolon": false
+    "semicolon": false,
+    "member-access": false
   }
 }
