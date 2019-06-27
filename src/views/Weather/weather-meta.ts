@@ -36,7 +36,23 @@ export default class Tianqi2345 {
     return counties;
   }
 
-  static watherScriptUrl(city: string, month: Date): string {
+  static async queryWeatherData(city: string, month: Date): Promise<{
+    days: WeatherDayInfo[],
+    stat: WeatherMonthStat,
+  }> {
+    const url = this.dataScriptUrl(city, month);
+    await this.appendScript(url);
+    return {
+      days: weather_str.tqInfo,
+      stat: _.omit(weather_str, 'tqInfo') as WeatherMonthStat,
+    }
+  }
+
+  static initalize() {
+    this.appendScript(CITY_SCRIPT_URL);
+  }
+
+  private static dataScriptUrl(city: string, month: Date): string {
     const m1 = dayjs(month).format('YYYYM');
     const m2 = dayjs(month).format('YYYYMM');
 
@@ -44,20 +60,26 @@ export default class Tianqi2345 {
     return `http://tianqi.2345.com/t/wea_history/js/${path}`;
   }
 
-  static initalize() {
-    this.appendScript(CITY_SCRIPT_URL);
-  }
-
-  private static appendScript(url: string, charset = 'gb2312') {
+  private static async appendScript(url: string, charset = 'gb2312') {
     const script = document.createElement('script');
     script.setAttribute('src', url);
     script.setAttribute('charset', charset);
-    document.head.appendChild(script);
+
+    await new Promise((resolve, reject) => {
+      script.onload = () => {
+        resolve();
+      }
+      script.onerror = () => {
+        reject();
+      }
+      document.head.appendChild(script);
+    });
   }
 }
 
 declare const prov: any;
 declare const provqx: any;
+declare const weather_str: any;
 
 const CITY_SCRIPT_URL = 'http://tianqi.2345.com/js/citySelectData.js';
 
@@ -96,4 +118,33 @@ const PROVINCE_MAP = {
   40: '新疆',
   41: '云南',
   42: '浙江',
+}
+
+export interface WeatherDayInfo {
+  aqi: number,
+  aqiInfo: string,
+  aqiLevel: number,
+  bWendu: string,
+  yWendu: string,
+  fengli: string,
+  fengxiang: string,
+  tianqi: string,
+  ymd: string,
+}
+
+export interface WeatherMonthStat {
+  avgAqi: number,
+  avgbWendu: number,
+  avgyWendu: number,
+  city: string,
+  maxAqi: number,
+  maxAqiDate: string,
+  maxAqiInfo: string,
+  maxAqiLevel: number,
+  maxWendu: string,
+  minAqi: number,
+  minAqiDate: string
+  minAqiInfo: string,
+  minAqiLevel: number,
+  minWendu: string,
 }

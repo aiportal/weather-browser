@@ -1,5 +1,6 @@
 <template>
   <div>
+    
     <el-cascader
       placeholder="请选择城市"
       clearable
@@ -7,50 +8,63 @@
       :options="cityOptions"
       :props="cityProps"
     ></el-cascader>
+    
     <el-date-picker
       placeholder="请选择月份"
       type="month"
       v-model="month"
       :picker-options="monthOptions"
     ></el-date-picker>
-    <el-button v-on:click="loadScripts">比较</el-button>
+
+    <el-button v-on:click="loadWeatherData">比较</el-button>
+
+    <div id="chart" ref="chart"></div>
+
   </div>
 </template>
 
 <script lang="ts">
-
-// vue component
-import { Component, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import Component from 'vue-class-component'
+import echarts from 'echarts';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
 import WeatherMeta from './weather-meta';
 
-@Component({
-  components: {},
-  props: {},
-})
+@Component
 export default class Weather extends Vue {
   private cities: any[] = [];
   private month: Date = new Date();
-  private cityOptions: any[] = WeatherMeta.getProvinceList();
-  private cityProps: any = {
-    lazy: true,
-    lazyLoad: this.loadCityList,
-    value: 'code',
-    label: 'name',
-    expandTrigger: 'hover',
-    multiple: true,
-    emitPath: false,
+  private chart: any;
+
+  get cityProps() {
+    return {
+      lazy: true,
+      lazyLoad: this.loadCityList,
+      value: 'code',
+      label: 'name',
+      expandTrigger: 'hover',
+      multiple: true,
+      emitPath: false,
+    }
   }
-  private monthOptions: any = {
-    disabledDate: (time: Date): boolean =>
-      dayjs(time).isBefore(WeatherMeta.minMonth, 'M') ||
-      dayjs(time).isAfter(WeatherMeta.maxMonth, 'M'),
+
+  get monthOptions() {
+    return {
+      disabledDate: (time: Date): boolean =>
+        dayjs(time).isBefore(WeatherMeta.minMonth, 'M') ||
+        dayjs(time).isAfter(WeatherMeta.maxMonth, 'M'),
+    }
+  }
+
+  get cityOptions() {
+    return WeatherMeta.getProvinceList();
   }
 
   mounted() {
     WeatherMeta.initalize();
+//    echarts.init(this.$refs.chart);
   }
 
   loadCityList(node: any, resolve: any) {
@@ -67,9 +81,12 @@ export default class Weather extends Vue {
     }
   }
 
-  loadScripts() {
+  async loadWeatherData() {
     for (const city of this.cities) {
-      const url = WeatherMeta.watherScriptUrl(city, this.month);
+      const {days, stat} = await WeatherMeta.queryWeatherData(city, this.month);
+      // this.message = JSON.stringify(days);
+      // console.log(days, stat);
+      // const url = WeatherMeta.watherScriptUrl(city, this.month);
     }
     // console.log(this.cities, typeof(this.month));
   }
