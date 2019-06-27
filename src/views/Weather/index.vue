@@ -1,9 +1,7 @@
 <template>
   <div>
     
-    <CitySelect
-      v-model="cities"
-    ></CitySelect>
+    <CitySelect v-model="cities"></CitySelect>
     
     <el-date-picker
       placeholder="请选择月份"
@@ -13,11 +11,17 @@
     ></el-date-picker>
 
     <el-button v-on:click="loadWeatherData">比较</el-button>
+
+    <MonthSlider
+      class="month_slider"
+    ></MonthSlider>
+
     <LineChart
       title="历史天气比较"
       :dates="chartDates"
       :series="chartSeries"
     ></LineChart>
+
   </div>
 </template>
 
@@ -29,11 +33,13 @@ import dayjs from 'dayjs';
 
 import WeatherMeta from './weather-meta';
 import CitySelect from './CitySelect.vue';
+import MonthSlider from './MonthSlider.vue';
 import LineChart from './LineChart.vue';
 
 @Component({
   components: {
     CitySelect,
+    MonthSlider,
     LineChart,
   }
 })
@@ -79,7 +85,7 @@ export default class Weather extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
   #chart {
     width: 100%;
     height: 500px;
