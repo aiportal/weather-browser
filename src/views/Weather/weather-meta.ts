@@ -42,9 +42,11 @@ export default class Tianqi2345 {
   }> {
     const url = this.dataScriptUrl(city, month);
     await this.appendScript(url);
+    const days = _(weather_str.tqInfo).reject(_.isEmpty).value();
+    const stat = _.omit(weather_str, 'tqInfo') as WeatherMonthStat;
     return {
-      days: weather_str.tqInfo,
-      stat: _.omit(weather_str, 'tqInfo') as WeatherMonthStat,
+      days,
+      stat,
     }
   }
 
