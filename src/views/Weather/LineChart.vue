@@ -31,6 +31,7 @@ export default class LineChart extends Vue {
 
   @Watch('chartOption')
   onChartOptionChanged(value: any) {
+    this.chart.clear();
     this.chart.setOption(value);
   }
 

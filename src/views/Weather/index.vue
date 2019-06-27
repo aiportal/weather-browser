@@ -1,14 +1,9 @@
 <template>
   <div>
     
-    <el-cascader
-      placeholder="请选择城市"
-      clearable
+    <CitySelect
       v-model="cities"
-      :options="cityOptions"
-      :props="cityProps"
-      collapse-tags
-    ></el-cascader>
+    ></CitySelect>
     
     <el-date-picker
       placeholder="请选择月份"
@@ -18,9 +13,8 @@
     ></el-date-picker>
 
     <el-button v-on:click="loadWeatherData">比较</el-button>
-
     <LineChart
-      title="天气历史比较"
+      title="历史天气比较"
       :dates="chartDates"
       :series="chartSeries"
     ></LineChart>
@@ -34,30 +28,20 @@ import _ from 'lodash';
 import dayjs from 'dayjs';
 
 import WeatherMeta from './weather-meta';
-import LineChart from './LineChart';
+import CitySelect from './CitySelect.vue';
+import LineChart from './LineChart.vue';
 
 @Component({
   components: {
+    CitySelect,
     LineChart,
   }
 })
 export default class Weather extends Vue {
-  private cities: any[] = [];
+  private cities: string[] = [];
   private month: Date = new Date();
   private chartDates: string[] = [];
   private chartSeries: any[] = [];
-
-  get cityProps() {
-    return {
-      lazy: true,
-      lazyLoad: this.loadCityList,
-      value: 'code',
-      label: 'name',
-      expandTrigger: 'hover',
-      multiple: true,
-      emitPath: false,
-    }
-  }
 
   get monthOptions() {
     return {
@@ -67,43 +51,28 @@ export default class Weather extends Vue {
     }
   }
 
-  get cityOptions() {
-    return WeatherMeta.getProvinceList();
-  }
-
-  mounted() {
-    WeatherMeta.initalize();
-  }
-
-  loadCityList(node: any, resolve: any) {
-    if (node.level === 1) {
-      const children = WeatherMeta.getCityList(node.value);
-      resolve(children);
-    } else {
-      const province = _.get(node, 'parent.value');
-      const children = WeatherMeta.getCountyList(province, node.value);
-      _(children).each((x) => {
-        _.assign(x, {leaf: true});
-      });
-      resolve(children);
-    }
-  }
-
   async loadWeatherData() {
-    let dates = null;
-    const series = [];
+    const dates: string[] = [];
+    const series: any[] = [];
+
     for (const city of this.cities) {
       const {days, stat} = await WeatherMeta.queryWeatherData(city, this.month);
-      if (!dates) {
-        dates = _(days).map('ymd').value();
+      if (_.isEmpty(dates)) {
+        dates.push(..._.map(days, 'ymd'));
       }
-      const serial = {
+      const serialMin = {
         name: stat.city,
         type: 'line',
         data: _(days).map((x) => Number.parseInt(x.bWendu, 10)).value(),
       }
-      series.push(serial);
+      const serialMax = {
+        name: stat.city,
+        type: 'line',
+        data: _(days).map((x) => Number.parseInt(x.yWendu, 10)).value(),
+      }
+      series.push(serialMin, serialMax);
     }
+
     this.chartDates = dates;
     this.chartSeries = series;
   }
