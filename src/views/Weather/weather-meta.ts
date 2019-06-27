@@ -1,23 +1,63 @@
 import dayjs from 'dayjs';
+import _ from 'lodash';
 
 /**
  * meta data from http://tianqi.2345.com
  */
 export default class Tianqi2345 {
-  public static readonly minMonth = new Date('2011-01');
-  public static readonly maxMonth = new Date();
+  static readonly minMonth = new Date('2011-01');
+  static readonly maxMonth = new Date();
 
-  public static get provinceMap() { return PROVINCE_MAP; }
-  public static get cityScriptUrl() { return CITY_SCRIPT_URL; }
+  static getProvinceList(): Array<{code: string, name: string}> {
+    const provinces = _(PROVINCE_MAP)
+      .map((v, k) => ({code: k, name: v}))
+      .value();
+    return provinces;
+  }
 
-  public static watherUrl(city: string, month: Date): string {
+  static getCityList(province: string): Array<{code: string, name: string}> {
+    const cities = _((prov[province] || ''))
+      .split('|')
+      .map((x) => /(\d+)-\w (\S+)-(\d+)/.exec(x))
+      .compact()
+      .map((x) => ({code: x[1], name: x[2]}))
+      .value();
+    return cities;
+  }
+
+  static getCountyList(province: string, city?: string): Array<{code: string, name: string}> {
+    const counties = _(provqx[province])
+      .split('|')
+      .map((x) => /(\d+)-\w (\S+)-(\d+)/.exec(x))
+      .compact()
+      .map((x) => ({code: x[1], name: x[2], city: x[3]}))
+      .filter((x) => (city && city.length > 2) ? x.city === city : true)
+      .value();
+    return counties;
+  }
+
+  static watherScriptUrl(city: string, month: Date): string {
     const m1 = dayjs(month).format('YYYYM');
     const m2 = dayjs(month).format('YYYYMM');
 
     const path = dayjs(month).isBefore('2016-03') ? `${city}_${m1}.js` : `${m2}/${city}_${m2}.js`;
     return `http://tianqi.2345.com/t/wea_history/js/${path}`;
   }
+
+  static initalize() {
+    this.appendScript(CITY_SCRIPT_URL);
+  }
+
+  private static appendScript(url: string, charset = 'gb2312') {
+    const script = document.createElement('script');
+    script.setAttribute('src', url);
+    script.setAttribute('charset', charset);
+    document.head.appendChild(script);
+  }
 }
+
+declare const prov: any;
+declare const provqx: any;
 
 const CITY_SCRIPT_URL = 'http://tianqi.2345.com/js/citySelectData.js';
 

@@ -19,15 +19,12 @@
 
 <script lang="ts">
 
-// city list
-import WeatherMeta from './weather-meta';
-declare const prov: any;
-declare const provqx: any;
-
 // vue component
 import { Component, Vue } from 'vue-property-decorator';
 import _ from 'lodash';
 import dayjs from 'dayjs';
+
+import WeatherMeta from './weather-meta';
 
 @Component({
   components: {},
@@ -36,10 +33,12 @@ import dayjs from 'dayjs';
 export default class Weather extends Vue {
   private cities: any[] = [];
   private month: Date = new Date();
-  private cityOptions: any[] = [];
+  private cityOptions: any[] = WeatherMeta.getProvinceList();
   private cityProps: any = {
     lazy: true,
     lazyLoad: this.loadCityList,
+    value: 'code',
+    label: 'name',
     expandTrigger: 'hover',
     multiple: true,
     emitPath: false,
@@ -51,49 +50,28 @@ export default class Weather extends Vue {
   }
 
   mounted() {
-    this.appendScript(WeatherMeta.cityScriptUrl, 'gb2312');
-    this.loadCityList();
+    WeatherMeta.initalize();
   }
 
-  loadCityList(node?: any, resolve?: any) {
-    if (!node) {
-      this.cityOptions = _(WeatherMeta.provinceMap)
-        .map((v, k) => ({label: v, value: k}))
-        .value();
-      return;
-    }
-    const {level, value: key} = node;
-    if (level === 1) {
-      const cities = _((prov[key] || ''))
-        .split('|')
-        .map((x) => /(\d+)-\w (\S+)-(\d+)/.exec(x))
-        .compact()
-        .map((x) => ({value: x[1], label: x[2]}))
-        .value();
-      resolve(cities);
-    }
-    if (level === 2) {
+  loadCityList(node: any, resolve: any) {
+    if (node.level === 1) {
+      const children = WeatherMeta.getCityList(node.value);
+      resolve(children);
+    } else {
       const province = _.get(node, 'parent.value');
-      const counties = _(provqx[province])
-        .split('|')
-        .map((x) => /(\d+)-\w (\S+)-(\d+)/.exec(x))
-        .compact()
-        .map((x) => ({value: x[1], label: x[2], parent: x[3], leaf: true}))
-        .filter((x) => x.parent === key || key.length < 5)
-        .value();
-      resolve(counties);
+      const children = WeatherMeta.getCountyList(province, node.value);
+      _(children).each((x) => {
+        _.assign(x, {leaf: true});
+      });
+      resolve(children);
     }
   }
 
   loadScripts() {
-    console.log(this.cities, typeof(this.month));
-  }
-
-  appendScript(url: string, charset = 'utf8') {
-    const script = document.createElement('script');
-    script.setAttribute('src', url);
-    script.setAttribute('charset', charset);
-    document.head.appendChild(script);
+    for (const city of this.cities) {
+      const url = WeatherMeta.watherScriptUrl(city, this.month);
+    }
+    // console.log(this.cities, typeof(this.month));
   }
 }
 </script>
