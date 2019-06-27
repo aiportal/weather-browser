@@ -2,11 +2,10 @@
   <el-cascader
     placeholder="请选择城市"
     clearable
-    :value="value"
+    v-model="city"
     :options="cityOptions"
     :props="cityProps"
     :collapse-tags="collapse"
-    @change="onChange"
   ></el-cascader>
 </template>
 
@@ -38,11 +37,10 @@ import WeatherMeta from './weather-meta';
 })
 export default class CitySelect extends Vue {
 
-  get data() {
+  get city() {
     return _.get(this.$props, 'value');
   }
-
-  onChange(value: any) {
+  set city(value: any) {
     this.$emit('input', value);
   }
 
