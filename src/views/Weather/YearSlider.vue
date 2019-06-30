@@ -1,8 +1,8 @@
 <template>
   <el-slider
-    :min="1"
-    :max="12"
-    v-model="months"
+    :min="min"
+    :max="max"
+    v-model="years"
     :range="range"
     show-stops
   ></el-slider>
@@ -15,21 +15,29 @@ import dayjs from 'dayjs';
 @Component({
   props: {
     value: Array,
+    min: {
+      type: Number,
+      default: dayjs().add(-5, 'year').year(),
+    },
+    max: {
+      type: Number,
+      default: dayjs().year(),
+    },
     range: {
       type: Boolean,
       default: true,
     }
   }
 })
-export default class MonthSlider extends Vue {
+export default class YearSlider extends Vue {
 
-  months: number[] = [1, dayjs().month() + 1];
+  years: number[] = [dayjs().year(), dayjs().year()];
 
-  @Watch('months')
+  @Watch('years')
   @Emit('input')
   @Emit('change')
-  onRangeChanged() {
-    return this.months;
+  onYearsChanged() {
+    return this.years;
   }
 }
 </script>

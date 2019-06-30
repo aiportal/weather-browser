@@ -12,8 +12,12 @@
 
     <el-button v-on:click="loadWeatherData">比较</el-button>
 
+    <YearSlider
+      v-model="years"
+    ></YearSlider>
+
     <MonthSlider
-      class="month_slider"
+      v-model="months"
     ></MonthSlider>
 
     <LineChart
@@ -33,18 +37,22 @@ import dayjs from 'dayjs';
 
 import WeatherMeta from './weather-meta';
 import CitySelect from './CitySelect.vue';
+import YearSlider from './YearSlider.vue';
 import MonthSlider from './MonthSlider.vue';
 import LineChart from './LineChart.vue';
 
 @Component({
   components: {
     CitySelect,
+    YearSlider,
     MonthSlider,
     LineChart,
   }
 })
 export default class Weather extends Vue {
   private cities: string[] = [];
+  private years: number[] = [];
+  private months: number[] = [];
   private month: Date = new Date();
   private chartDates: string[] = [];
   private chartSeries: any[] = [];
@@ -60,6 +68,8 @@ export default class Weather extends Vue {
   async loadWeatherData() {
     const dates: string[] = [];
     const series: any[] = [];
+    console.log(this.years, this.months);
+    return;
 
     for (const city of this.cities) {
       const {days, stat} = await WeatherMeta.queryWeatherData(city, this.month);
