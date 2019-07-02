@@ -12,13 +12,9 @@
 
     <el-button v-on:click="loadWeatherData">比较</el-button>
 
-    <YearSlider
-      v-model="years"
-    ></YearSlider>
+    <YearSlider v-model="years" :min="2011"></YearSlider>
 
-    <MonthSlider
-      v-model="months"
-    ></MonthSlider>
+    <MonthSlider v-model="months"></MonthSlider>
 
     <LineChart
       title="历史天气比较"
@@ -66,30 +62,54 @@ export default class Weather extends Vue {
   }
 
   async loadWeatherData() {
-    const dates: string[] = [];
     const series: any[] = [];
-    console.log(this.years, this.months);
-    return;
+
+    console.log(this.cities, this.years, this.months);
+    console.log(_.range(this.years[0], this.years[1] + 1), _.range(this.months[0], this.months[1]));
 
     for (const city of this.cities) {
-      const {days, stat} = await WeatherMeta.queryWeatherData(city, this.month);
-      if (_.isEmpty(dates)) {
-        dates.push(..._.map(days, 'ymd'));
-      }
-      const serialMin = {
-        name: stat.city,
-        type: 'line',
-        data: _(days).map((x) => Number.parseInt(x.bWendu, 10)).value(),
-      }
-      const serialMax = {
-        name: stat.city,
-        type: 'line',
-        data: _(days).map((x) => Number.parseInt(x.yWendu, 10)).value(),
-      }
-      series.push(serialMin, serialMax);
-    }
 
-    this.chartDates = dates;
+      const dates: string[] = [];
+      const dataMin: number[] = [];
+      const dataMax: number[] = [];
+      const stats: any[] = [];
+
+      for (const year of _.range(this.years[0], this.years[1] + 1)) {
+        for (const month of _.range(this.months[0], this.months[1] + 1)) {
+
+          let days: any[] = [];
+          let stat: any;
+          try {
+            const date = dayjs(`${year}-${month}`).toDate();
+            const res = await WeatherMeta.queryWeatherData(city, date);
+            [days, stat] = [res.days, res.stat];
+          } catch (ex) {
+            alert(ex.message);
+          }
+
+          dates.push(..._.map(days, 'ymd'));
+          dataMin.push(..._(days).map((x) => Number.parseInt(x.bWendu, 10)).value());
+          dataMax.push(..._(days).map((x) => Number.parseInt(x.yWendu, 10)).value());
+          stats.push(stat);
+        }
+
+        this.chartDates = _(dates).uniq().sort().value();
+
+        const serialMin = {
+          name: stats[0].city,
+          type: 'line',
+          smooth: true,
+          data: dataMin,
+        }
+        const serialMax = {
+          name: stats[0].city,
+          type: 'line',
+          smooth: true,
+          data: dataMax,
+        }
+        series.push(serialMin, serialMax);
+      }
+    }
     this.chartSeries = series;
   }
 }
