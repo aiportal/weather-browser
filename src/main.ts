@@ -4,7 +4,8 @@ import router from './router';
 import store from './store';
 
 import echarts from 'echarts';
-import './plugins/element.js'
+import './plugins/element.js';
+import './plugins/antd.ts';
 Vue.prototype.$echarts = echarts;
 
 Vue.config.productionTip = false;

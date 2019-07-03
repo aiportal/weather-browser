@@ -1,6 +1,8 @@
 <template>
   <div>
     
+    <a-button type="primary">Button</a-button>
+
     <CitySelect v-model="cities"></CitySelect>
     
     <el-date-picker
