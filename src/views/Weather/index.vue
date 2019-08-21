@@ -3,18 +3,15 @@
 
     <CitySelect v-model="cities"></CitySelect>
     
-    <el-date-picker
-      placeholder="请选择月份"
-      type="month"
-      v-model="month"
-      :picker-options="monthOptions"
-    ></el-date-picker>
-
     <el-button v-on:click="loadWeatherData">比较</el-button>
 
-    <YearSlider v-model="years" :min="2011"></YearSlider>
+    <div style="margin: 0 30px 0 30px">
+      <YearSlider v-model="years" :min="2011"></YearSlider>
+    </div>
 
-    <MonthSlider v-model="months"></MonthSlider>
+    <div style="margin: 0 30px 0 30px">
+      <MonthSlider v-model="months"></MonthSlider>
+    </div>
 
     <LineChart
       title="历史天气比较"
@@ -49,17 +46,8 @@ export default class Weather extends Vue {
   private cities: string[] = [];
   private years: number[] = [];
   private months: number[] = [];
-  private month: Date = new Date();
   private chartDates: string[] = [];
   private chartSeries: any[] = [];
-
-  get monthOptions() {
-    return {
-      disabledDate: (time: Date): boolean =>
-        dayjs(time).isBefore(WeatherMeta.minMonth, 'M') ||
-        dayjs(time).isAfter(WeatherMeta.maxMonth, 'M'),
-    }
-  }
 
   async loadWeatherData() {
     const series: any[] = [];
