@@ -3,10 +3,9 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
-import echarts from 'echarts';
 import './plugins/element.js';
 import './plugins/antd.ts';
-Vue.prototype.$echarts = echarts;
+import './plugins/echarts.ts';
 
 Vue.config.productionTip = false;
 
