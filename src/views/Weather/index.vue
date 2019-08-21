@@ -3,7 +3,7 @@
 
     <CitySelect v-model="cities"></CitySelect>
     
-    <el-button v-on:click="loadWeatherData">比较</el-button>
+    <el-button v-on:click="loadWeatherData" type="primary" style="margin-left: 20px">比较</el-button>
 
     <div style="margin: 0 30px 0 30px">
       <YearSlider v-model="years" :min="2011"></YearSlider>
