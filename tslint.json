@@ -19,6 +19,7 @@
     "only-arrow-functions": false,
     "no-inferrable-types": true,
     "semicolon": false,
+    "no-console": false,
     "member-access": false
   }
 }

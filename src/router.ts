@@ -21,5 +21,6 @@ export default new Router({
     },
     { path: '/browser', component: () => import('./views/Browser.vue') },
     { path: '/weather', component: () => import('./views/Weather/index.vue') },
+    { path: '/history', component: () => import('./views/WeatherHistory.vue') },
   ],
 });
