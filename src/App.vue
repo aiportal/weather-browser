@@ -4,8 +4,8 @@
       <!-- <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> | 
       <router-link to="/browser">Browser</router-link> |  -->
-      <router-link to="/weather">Weather</router-link> |
-      <router-link to="/Histroy">Histroy</router-link>
+      <!-- <router-link to="/weather">Weather</router-link> |
+      <router-link to="/Histroy">Histroy</router-link> -->
     </div>
     <router-view/>
   </div>
