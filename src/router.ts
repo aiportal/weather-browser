@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
+import Weather from './views/Weather/index.vue';
 
 Vue.use(Router);
 
@@ -8,8 +9,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      name: 'weather',
+      component: Weather,
     },
     {
       path: '/about',
@@ -21,5 +22,6 @@ export default new Router({
     },
     { path: '/browser', component: () => import('./views/Browser.vue') },
     { path: '/weather', component: () => import('./views/Weather/index.vue') },
+    { path: '/history', component: () => import('./views/WeatherHistory.vue') },
   ],
 });
