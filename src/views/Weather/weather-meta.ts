@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 
 /**
- * meta data from http://tianqi.2345.com
+ * meta data from https://tianqi.2345.com
  */
 export default class Tianqi2345 {
   static readonly minMonth = new Date('2011-01');
@@ -59,7 +59,7 @@ export default class Tianqi2345 {
     const m2 = dayjs(month).format('YYYYMM');
 
     const path = dayjs(month).isBefore('2016-03') ? `${city}_${m1}.js` : `${m2}/${city}_${m2}.js`;
-    return `http://tianqi.2345.com/t/wea_history/js/${path}`;
+    return `https://tianqi.2345.com/t/wea_history/js/${path}`;
   }
 
   private static async appendScript(url: string, charset = 'gb2312') {
@@ -83,7 +83,7 @@ declare const prov: any;
 declare const provqx: any;
 declare const weather_str: any;
 
-const CITY_SCRIPT_URL = 'http://tianqi.2345.com/js/citySelectData.js';
+const CITY_SCRIPT_URL = 'https://tianqi.2345.com/js/citySelectData.js';
 
 const PROVINCE_MAP = {
   10: '安徽',
